@@ -36,16 +36,19 @@
 	},
 	"dfu": {
 		"step": {
-			"set_update_mode": "ステップ1: {device} トラッカーをDFUモードにします。",
-			"select_update_mode": "ステップ2: {device} トラッカーを再度選択します。",
-			"flash": "ステップ3： 選択したファームウェアを {device} トラッカーに書き込みます。"
+			"check_version": "ステップ0: 使用されている {device} のファームウェアバージョンを確認します。",
+			"set_update_mode": "ステップ1: {device} をDFUモードにします。",
+			"select_update_mode": "ステップ2: {device} を再度選択します。",
+			"flash": "ステップ3： 選択したファームウェアを {device} に書き込みます。"
 		},
 		"step_note": {
-			"set_update_mode": "これにより、トラッカーはDFU（Device Firmware Update）モードになり、\"HaritoraXW-Update\"と表示されます。",
-			"select_update_mode": "DFU（デバイスファームウェアアップデート）モードになったトラッカーを選択します。 \"HaritoraXW-Update\"と表示されるはずです。",
+			"check_version": "（オプション）お使いのデバイスの現在のファームウェアバージョンをチェックします。 現在のファームウェアバージョンを知っている場合は省略できます。",
+			"set_update_mode": "これにより、デバイスはDFU（Device Firmware Update）モードになり、\"HaritoraXW-Update\"と表示されます。",
+			"select_update_mode": "DFU（デバイスファームウェアアップデート）モードになったデバイスを選択します。 \"HaritoraXW-Update\"と表示されているはずです。",
 			"flash": "これにより、選択したファームウェアがトラッカーに書き込まれます。"
 		},
 		"button": {
+			"check_version": "Check version",
 			"set_update_mode": "更新モードに設定",
 			"select_update_mode": "DFUデバイスを選択",
 			"flash": "ファームウェア書き込み"
@@ -118,6 +121,10 @@
 		"web_bluetooth_error": {
 			"title": "なぜ\"web bluetooth is not supported\"エラーが表示されるのですか？",
 			"description": "これは、お使いのブラウザがWebブルートゥースをサポートしていないか、有効になっていないことを意味します。 サポートされているChromiumベースのブラウザ（ChromeやMS Edgeなど）を使用していることを確認してください。\nBraveのように、デフォルトでWeb Bluetoothを無効にし、ブラウザのフラグ（chrome://flags）を変更する必要があるブラウザや、まったくサポートしていないブラウザ（Firefox）もあります。"
+		},
+		"why_bluetooth_needed": {
+			"title": "なぜBluetoothでしかアップデートできないのですか？",
+			"description": "我々の知る限り、ファームウェアの制限によってBluetooth経由でしかアップデートできません。 Shiftallは将来ファームウェアのアップデートでサポートを追加するかもしれないですが、現在はアップデートにBluetoothが必要です。"
 		}
 	}
 }
