@@ -3,24 +3,24 @@
 	import { packetSendDelay, showAllVersions, type FirmwareVersion } from '$lib/store';
 	import { Device, firmwareVersions } from '$lib/store';
 	import { addToast } from '$lib/store/ToastProvider';
-	import { firmwareUpdater } from '$lib/store/updater';
+	import { firmwareUpdater as dfuBLE } from '$lib/updater/nrf52';
+	import { firmwareUpdater as dfuSerial } from '$lib/updater/nrf52_dongle';
 	import Icon from '@iconify/svelte';
 	import { Progress } from '@skeletonlabs/skeleton-svelte';
 	import { browser } from '$app/environment';
-	import { onMount } from 'svelte';
 
-	let selectedDevice = $state(Device.HaritoraX2);
+	let selectedDevice = $state<Device>(Device.HaritoraX2);
 	let firmwareList = $derived(firmwareVersions[selectedDevice]);
 	let selectedFirmware = $state<FirmwareVersion>();
 
-	let dfuDevice = $state<BluetoothDevice | null>(null);
+	let firmwareUpdater = $state<typeof dfuBLE | typeof dfuSerial | null>(null);
+	let dfuDevice = $state<USBDevice | BluetoothDevice | null>(null);
 	let updateProgress = $state(0);
 	let updateStatus = $state(m['dfu.status.waiting']());
 	let isUpdating = $state(false);
-	let hasBtSupport = $state(true);
+	let hasSupport = $state(true);
 	let logMessages = $state<string[]>([]);
 
-	// TODO: variable for bluetooth support and disable buttons when false
 	// TODO: use connection_lost and cancelled
 
 	$effect(() => {
@@ -28,21 +28,67 @@
 		selectedFirmware = $showAllVersions ? firmwareList[0] : firmwareList.find((fw) => !fw.untested);
 	});
 
-	if (firmwareUpdater) {
-		firmwareUpdater.setProgressCallback((progress) => {
-			updateProgress = Math.round((progress.currentBytes / progress.totalBytes) * 100);
-			updateStatus = m['dfu.status.updating']({
-				progress: updateProgress,
-				total: progress.totalBytes,
-				current: progress.currentBytes
-			});
-		});
+	$effect(() => {
+		console.log(`Device: ${selectedDevice}`);
+		async function run() {
+			if (!browser) return;
 
-		firmwareUpdater.setLogCallback((message) => {
-			logMessages = [...logMessages, message];
-		});
-	}
+			// set new updater when selectedDevice changes
+			if (selectedDevice === Device.GX) {
+				if (!navigator.usb) {
+					console.log('WebUSB API supported: No');
+					addToast('error', m['toasts.web_usb_not_supported'](), false);
+					hasSupport = false;
+					return;
+				}
 
+				console.log('Web USB API supported: Yes');
+				firmwareUpdater = dfuSerial;
+				if (dfuSerial) {
+					dfuSerial.setProgressCallback((progress) => {
+						updateProgress = Math.round((progress.currentBytes / progress.totalBytes) * 100);
+						updateStatus = m['dfu.status.updating']({
+							progress: updateProgress,
+							total: progress.totalBytes,
+							current: progress.currentBytes
+						});
+					});
+
+					dfuSerial.setLogCallback((message) => {
+						logMessages = [...logMessages, message];
+					});
+				}
+			} else {
+				if (!navigator.bluetooth || !(await navigator.bluetooth.getAvailability())) {
+					console.log('Bluetooth API supported: No');
+					addToast('error', m['toasts.web_bluetooth_not_supported'](), false);
+					hasSupport = false;
+					return;
+				}
+
+				console.log('Bluetooth API supported: Yes');
+
+				firmwareUpdater = dfuBLE;
+				if (dfuBLE) {
+					dfuBLE.setProgressCallback((progress) => {
+						updateProgress = Math.round((progress.currentBytes / progress.totalBytes) * 100);
+						updateStatus = m['dfu.status.updating']({
+							progress: updateProgress,
+							total: progress.totalBytes,
+							current: progress.currentBytes
+						});
+					});
+
+					dfuBLE.setLogCallback((message) => {
+						logMessages = [...logMessages, message];
+					});
+				}
+			}
+		}
+		run();
+	});
+
+	// TODO: support GX dongle (serial)
 	async function handleCheckVersion() {
 		try {
 			isUpdating = true;
@@ -71,7 +117,7 @@
 			const found = firmwareList.find((fw) => fw.version === firmwareVersion);
 			firmwareDate = found ? found.date : 'Unknown';
 
-			addToast("info", `${firmwareVersion} (${firmwareDate})`, false);
+			addToast('info', `${firmwareVersion} (${firmwareDate})`, false);
 			console.log(`Firmware version: ${firmwareVersion} (${firmwareDate})`);
 			updateStatus = m['dfu.status.got_version']({
 				version: firmwareVersion,
@@ -80,7 +126,7 @@
 			logMessages = [...logMessages, `Firmware version: ${firmwareVersion} (${firmwareDate})`];
 		} catch (error) {
 			updateStatus = `${error instanceof Error ? error.message : 'Unknown error'}`;
-			addToast("error", updateStatus, false);
+			addToast('error', updateStatus, false);
 			console.error('Check version error:', error);
 		} finally {
 			isUpdating = false;
@@ -99,11 +145,11 @@
 
 			await firmwareUpdater.setUpdateMode();
 			updateStatus = m['dfu.status.set_update_mode']();
-			addToast("success", m['dfu.status.set_update_mode'](), true);
+			addToast('success', m['dfu.status.set_update_mode'](), true);
 		} catch (error) {
 			updateStatus = `${error instanceof Error ? error.message : 'Unknown error'}`;
 			console.error('Set update mode error:', error);
-			addToast("error", updateStatus, false);
+			addToast('error', updateStatus, false);
 		} finally {
 			isUpdating = false;
 		}
@@ -116,16 +162,16 @@
 
 			if (!firmwareUpdater) {
 				updateStatus = m['dfu.status.firmware_updater_not_initialized']();
-				addToast("error", updateStatus, false);
+				addToast('error', updateStatus, false);
 				return;
 			}
 
 			dfuDevice = await firmwareUpdater.selectDFUDevice();
 			updateStatus = m['dfu.status.dfu_selected']();
-			addToast("success", m['dfu.status.dfu_selected'](), true);
+			addToast('success', m['dfu.status.dfu_selected'](), true);
 		} catch (error) {
 			updateStatus = `${error instanceof Error ? error.message : 'Unknown error'}`;
-			addToast("error", updateStatus, false);
+			addToast('error', updateStatus, false);
 			console.error('Select DFU device error:', error);
 		} finally {
 			isUpdating = false;
@@ -135,7 +181,7 @@
 	async function handleFlashFirmware() {
 		if (!dfuDevice || !selectedFirmware) {
 			updateStatus = m['dfu.status.please_select']();
-			addToast("warning", updateStatus, false);
+			addToast('warning', updateStatus, false);
 			return;
 		}
 
@@ -146,47 +192,42 @@
 
 			if (!firmwareUpdater) {
 				updateStatus = m['dfu.status.firmware_updater_not_initialized']();
-				addToast("error", updateStatus, false);
+				addToast('error', updateStatus, false);
 				return;
 			}
 
 			const firmwareBuffer = await firmwareUpdater.downloadFirmware(selectedFirmware);
-			await firmwareUpdater.flashFirmware(dfuDevice, firmwareBuffer);
+			if (selectedDevice === Device.GX) {
+				// wtf
+				await (firmwareUpdater as typeof dfuSerial)!.flashFirmware(
+					dfuDevice as USBDevice,
+					firmwareBuffer
+				);
+			} else {
+				// is this lmao
+				await (firmwareUpdater as typeof dfuBLE)!.flashFirmware(
+					dfuDevice as BluetoothDevice,
+					firmwareBuffer
+				);
+			}
 
 			updateStatus = m['dfu.status.firmware_completed']();
-			addToast("success", m['dfu.status.firmware_completed'](), true);
+			addToast('success', m['dfu.status.firmware_completed'](), true);
 			updateProgress = 100;
 		} catch (error) {
 			updateStatus = `${error instanceof Error ? error.message : 'Unknown error'}`;
-			addToast("error", updateStatus, false);
+			addToast('error', updateStatus, false);
 			console.error('Flash firmware error:', error);
 		} finally {
 			isUpdating = false;
 		}
 	}
-
-	// check for Web Bluetooth support on page load
-	onMount(async () => {
-		console.log(`Browser: ${browser}`);
-
-		if (!browser) return;
-
-		if (!navigator.bluetooth || !(await navigator.bluetooth.getAvailability())) {
-			console.log('Bluetooth API supported: No');
-			addToast('error', m['toasts.web_bluetooth_not_supported'](), false);
-			hasBtSupport = false;
-			return;
-		} else {
-			console.log('Bluetooth API supported: Yes');
-		}
-	});
 </script>
 
 <svelte:head>
 	<title>SlimeTora: DFU</title>
 </svelte:head>
 
-<!-- TODO: add button to check version -->
 <div class="mx-auto w-full max-w-2xl space-y-6">
 	<!-- Device and firmware selection -->
 	<div class="flex flex-col flex-wrap gap-6 rounded-lg bg-gray-800 p-6 shadow">
@@ -268,31 +309,39 @@
 	<div class="flex flex-col items-center gap-6 rounded-lg bg-gray-800 p-6 shadow">
 		<div class="flex flex-col items-center justify-center gap-3">
 			<div class="text-center">
-				<p>{m['dfu.step.check_version']({ tracker: selectedDevice })}</p>
+				<p>{m['dfu.step.check_version']({ device: selectedDevice })}</p>
 				<p class="text-sm opacity-70">{m['dfu.step_note.check_version']()}</p>
 			</div>
-			<button class="btn bg-primary-500" disabled={isUpdating || !hasBtSupport} onclick={handleCheckVersion}>
+			<button
+				class="btn bg-primary-500"
+				disabled={isUpdating || !hasSupport}
+				onclick={handleCheckVersion}
+			>
 				{m['dfu.button.check_version']()}
 			</button>
 		</div>
 		<hr class="hr" />
 		<div class="flex flex-col items-center justify-center gap-3">
 			<div class="text-center">
-				<p>{m['dfu.step.set_update_mode']({ tracker: selectedDevice })}</p>
+				<p>{m['dfu.step.set_update_mode']({ device: selectedDevice })}</p>
 				<p class="text-sm opacity-70">
 					{selectedDevice === Device.HaritoraX2
 						? m['dfu.step_note.set_update_mode']().replace('HaritoraXW-Update', 'HaritoraX2-Update')
 						: m['dfu.step_note.set_update_mode']()}
 				</p>
 			</div>
-			<button class="btn bg-primary-500" disabled={isUpdating || !hasBtSupport} onclick={handleSetUpdateMode}>
+			<button
+				class="btn bg-primary-500"
+				disabled={isUpdating || !hasSupport}
+				onclick={handleSetUpdateMode}
+			>
 				{m['dfu.button.set_update_mode']()}
 			</button>
 		</div>
 		<hr class="hr" />
 		<div class="flex flex-col items-center justify-center gap-3">
 			<div class="text-center">
-				<p>{m['dfu.step.select_update_mode']({ tracker: selectedDevice })}</p>
+				<p>{m['dfu.step.select_update_mode']({ device: selectedDevice })}</p>
 				<p class="text-sm opacity-70">
 					{selectedDevice === Device.HaritoraX2
 						? m['dfu.step_note.select_update_mode']().replace(
@@ -302,14 +351,18 @@
 						: m['dfu.step_note.select_update_mode']()}
 				</p>
 			</div>
-			<button class="btn bg-primary-500" disabled={isUpdating || !hasBtSupport} onclick={handleSelectDFUDevice}>
+			<button
+				class="btn bg-primary-500"
+				disabled={isUpdating || !hasSupport}
+				onclick={handleSelectDFUDevice}
+			>
 				{m['dfu.button.select_update_mode']()}
 			</button>
 		</div>
 		<hr class="hr" />
 		<div class="flex flex-col items-center justify-center gap-3">
 			<div class="text-center">
-				<p>{m['dfu.step.flash']({ tracker: selectedDevice })}</p>
+				<p>{m['dfu.step.flash']({ device: selectedDevice })}</p>
 				<p class="text-sm opacity-70">{m['dfu.step_note.flash']()}</p>
 			</div>
 			<button

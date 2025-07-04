@@ -1,5 +1,5 @@
 // ! Tracker firmware is not provided by this git repository.
-// ! You may modify this (or grab the firmware by yourself on https://dfu.slimetora.dev/firmware/{path to firmware} OR https://archive.org/details/shiftall_firmware)
+// ! You may modify this (or grab the firmware by yourself on https://dfu.slimetora.dev/firmware/{path_to_firmware} OR https://archive.org/details/shiftall_firmware)
 
 import { getLocale, setLocale } from '$lib/paraglide/runtime';
 import { writable } from 'svelte/store';
@@ -143,28 +143,26 @@ const haritoraxWirelessVersions: FirmwareVersion[] = [
 	}
 ];
 
-// TODO: use WebUSB to flash the GX dongle firmware
-// assume all "unknown" versions (commit hashes / "unknown" notes) have dates from VR Manager's Steam depot
-// const gxVersions: FirmwareVersion[] = [
-// 	{
-// 		version: '1.0.17',
-// 		date: '2023-10-30', // date from official manual
-// 		filename: `${urlPrefix}/mc3s_dongle/mc3_dongle_20230927_477d506.zip`,
-// 		notes: m['firmware.versions.mc3s_dongle.1.0.17']()
-// 	},
-// 	{
-// 		version: '1.0.19',
-// 		date: '2023-10-31', // date from official manual
-// 		filename: `${urlPrefix}/mc3s_dongle/mc3_dongle_20231005_fece09a.zip`,
-// 		notes: m['firmware.versions.mc3s_dongle.1.0.19']()
-// 	},
-// 	{
-// 		version: '1.0.26',
-// 		date: '2025-01-30', // date from official manual
-// 		filename: `${urlPrefix}/mc3s_dongle/mc3_dongle_mc3_bootloader_20240801_ea3497b.zip`,
-// 		notes: m['firmware.versions.mc3s_dongle.1.0.26']()
-// 	}
-// ];
+const gxVersions: FirmwareVersion[] = [
+	{
+		version: '1.0.17',
+		date: '2023-10-30', // date from official manual
+		filename: `${urlPrefix}/mc3_dongle/mc3_dongle_20230927_477d506.zip`,
+		notes: m['firmware.versions.mc3s_dongle.1.0.17']()
+	},
+	{
+		version: '1.0.19',
+		date: '2023-10-31', // date from official manual
+		filename: `${urlPrefix}/mc3_dongle/mc3_dongle_20231005_fece09a.zip`,
+		notes: m['firmware.versions.mc3s_dongle.1.0.19']()
+	},
+	{
+		version: '1.0.26',
+		date: '2025-01-30', // date from official manual
+		filename: `${urlPrefix}/mc3_dongle/mc3_dongle_mc3_bootloader_20240801_ea3497b.zip`,
+		notes: m['firmware.versions.mc3s_dongle.1.0.26']()
+	}
+];
 
 // const haritorax11bVersions: FirmwareVersion[] = [
 // 	{ version: '1.0.0', date: '2021-05-10', filename: '', notes: 'HaritoraX 1.1b initial release' },
@@ -183,18 +181,18 @@ const haritoraxWirelessVersions: FirmwareVersion[] = [
 
 export enum Device {
 	HaritoraX2 = 'HaritoraX 2',
-	HaritoraXWireless = 'HaritoraX Wireless'
+	HaritoraXWireless = 'HaritoraX Wireless',
 	//HaritoraX11b = 'HaritoraX 1.1b',
 	//HaritoraX11 = 'HaritoraX 1.1',
 	//HaritoraX10 = 'HaritoraX (1.0)',
-	// GX = 'GX (6/2)'
+	GX = 'GX (6/2)'
 }
 
 export const firmwareVersions: FirmwareVersionsMap = {
 	[Device.HaritoraX2]: haritorax2Versions,
-	[Device.HaritoraXWireless]: haritoraxWirelessVersions
+	[Device.HaritoraXWireless]: haritoraxWirelessVersions,
 	//[Device.HaritoraX11b]: haritorax11bVersions,
 	//[Device.HaritoraX11]: haritorax11Versions,
 	//[Device.HaritoraX10]: haritorax10Versions,
-	//[Device.GX]: gxVersions
+	[Device.GX]: gxVersions
 };

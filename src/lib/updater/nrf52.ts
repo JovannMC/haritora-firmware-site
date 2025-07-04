@@ -1,81 +1,10 @@
-import { packetSendDelay, type FirmwareVersion } from './index';
+import { packetSendDelay, type FirmwareVersion } from '../store/index';
 import CRC32 from 'crc-32';
-import JSZip, { type JSZipObject } from 'jszip';
 import SecureDfu from 'web-bluetooth-dfu';
 import { browser } from '$app/environment';
 import { get } from 'svelte/store';
+import { DFUPackage, type DFUProgress } from '.';
 
-interface DFUProgress {
-	object: string;
-	totalBytes: number;
-	currentBytes: number;
-}
-
-interface DFUImage {
-	type: string;
-	initFile: string;
-	imageFile: string;
-	initData: ArrayBuffer;
-	imageData: ArrayBuffer;
-}
-
-class DFUPackage {
-	private zipFile: JSZip | null = null;
-	private manifest: JSZipObject | null = null;
-
-	constructor(private buffer: ArrayBuffer) {}
-
-	async load(): Promise<DFUPackage> {
-		try {
-			this.zipFile = await JSZip.loadAsync(this.buffer);
-
-			const manifestFile = this.zipFile.file('manifest.json');
-			if (!manifestFile) throw new Error('manifest.json not found in DFU package');
-			const manifestContent = await manifestFile.async('string');
-			this.manifest = JSON.parse(manifestContent).manifest;
-			return this;
-		} catch {
-			throw new Error('Unable to find manifest, is this a proper DFU package?');
-		}
-	}
-
-	private async getImage(types: string[]): Promise<DFUImage | null> {
-		for (const type of types) {
-			if (this.manifest && this.manifest[type]) {
-				const entry = this.manifest[type];
-				const result = {
-					type: type,
-					initFile: entry.dat_file,
-					imageFile: entry.bin_file,
-					initData: null as unknown as ArrayBuffer,
-					imageData: null as unknown as ArrayBuffer
-				};
-
-				if (!this.zipFile) throw new Error('DFU package ZIP file is not loaded');
-				const initFileObj = this.zipFile.file(result.initFile);
-				if (!initFileObj) throw new Error(`Init file ${result.initFile} not found in DFU package`);
-				result.initData = await initFileObj.async('arraybuffer');
-
-				const imageFileObj = this.zipFile.file(result.imageFile);
-				if (!imageFileObj)
-					throw new Error(`Image file ${result.imageFile} not found in DFU package`);
-				result.imageData = await imageFileObj.async('arraybuffer');
-				return result;
-			}
-		}
-		return null;
-	}
-
-	async getBaseImage(): Promise<DFUImage | null> {
-		return this.getImage(['softdevice', 'bootloader', 'softdevice_bootloader']);
-	}
-
-	async getAppImage(): Promise<DFUImage | null> {
-		return this.getImage(['application']);
-	}
-}
-
-// DFU Update handler
 export class FirmwareUpdater {
 	private dfu: SecureDfu | null = null;
 	private progressCallback: ((progress: DFUProgress) => void) | null = null;
@@ -157,27 +86,6 @@ export class FirmwareUpdater {
 		}
 	}
 
-	// Download firmware file from server
-	async downloadFirmware(firmwareVersion: FirmwareVersion): Promise<ArrayBuffer> {
-		if (!browser) throw new Error('Firmware download not available in server environment');
-		try {
-			console.log(`Downloading firmware: ${firmwareVersion.filename}`);
-
-			const response = await fetch(`${firmwareVersion.filename}`);
-
-			if (!response.ok) {
-				throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-			}
-
-			const buffer = await response.arrayBuffer();
-			console.log(`Downloaded ${buffer.byteLength} bytes`);
-			return buffer;
-		} catch (error) {
-			console.error(`Error downloading firmware: ${error}`);
-			throw new Error(`Failed to download firmware: ${error}`);
-		}
-	}
-
 	// Step 3: flash firmware to device
 	async flashFirmware(device: BluetoothDevice, firmwareBuffer: ArrayBuffer): Promise<void> {
 		if (!browser || !this.dfu) throw new Error('DFU not available in server environment');
@@ -207,6 +115,26 @@ export class FirmwareUpdater {
 		} catch (error) {
 			console.error(`Error flashing firmware: ${error}`);
 			throw new Error(`Failed to flash firmware: ${error}`);
+		}
+	}
+
+	async downloadFirmware(firmwareVersion: FirmwareVersion): Promise<ArrayBuffer> {
+		if (!browser) throw new Error('Firmware download not available in server environment');
+		try {
+			console.log(`Downloading firmware: ${firmwareVersion.filename}`);
+
+			const response = await fetch(`${firmwareVersion.filename}`);
+
+			if (!response.ok) {
+				throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+			}
+
+			const buffer = await response.arrayBuffer();
+			console.log(`Downloaded ${buffer.byteLength} bytes`);
+			return buffer;
+		} catch (error) {
+			console.error(`Error downloading firmware: ${error}`);
+			throw new Error(`Failed to download firmware: ${error}`);
 		}
 	}
 

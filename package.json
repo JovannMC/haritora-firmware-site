@@ -46,11 +46,14 @@
 		"@inlang/paraglide-js": "^2.0.0",
 		"crc-32": "^1.2.2",
 		"jszip": "^3.10.1",
+		"usb": "^2.15.0",
 		"web-bluetooth-dfu": "^1.2.1",
 		"webbluetooth": "^3.3.2"
 	},
 	"trustedDependencies": [
 		"@tailwindcss/oxide",
+		"esbuild",
+		"usb",
 		"webbluetooth"
 	]
 }
