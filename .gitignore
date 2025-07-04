@@ -28,3 +28,7 @@ src/lib/paraglide
 # local certificates
 localhost-key.pem
 localhost.pem
+
+# firmware files
+/static/firmware/*
+ref/
