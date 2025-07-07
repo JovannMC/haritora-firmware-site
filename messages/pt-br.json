@@ -9,7 +9,7 @@
 		"settings": "Configurações",
 		"packet_send_delay": "Atraso no envio de packets (ms)",
 		"show_all_versions": "Mostrar versões de sistema não testadas",
-		"download_only": "Download firmware only",
+		"manual_update": "Download firmware only",
 		"demo_mode": "Modo de demonstração"
 	},
 	"firmware": {
@@ -45,14 +45,16 @@
 			"flash": "Step 3: Atualize o firmware selecionado no seu {device} dispositivo."
 		},
 		"step_note": {
-			"download_only": "Simplesmente baixa o firmware para o seu computador sem atualizar o rastreador. Útil para fins de arquivamento ou para usuários avançados experimentarem.",
+			"download_firmware": "Baixa o firmware que você quer atualizar ao seu dispositivo local. Isso é um arquivo de firmware oficial da Shiftall.",
 			"check_version": "Isso verificará a versão de firmware atual do seu dispositivo. Isso é opcional and pode ser ignorado se você sabe a versão atual do seu rastreador.",
 			"set_update_mode": "Isso colocará seu dispositivo no modo DFU (Device Firmware Update), deixando os dispositivos aparecerem como \"HaritoraXW-Update\".",
 			"select_update_mode": "Selecione o dispositivo que agora está no modo DFU (Device Firmware Update). Deve aparecer como \"HaritoraXW-Update\".",
 			"flash": "Isso vai atualizar a versão de firmware do seu dispositivo."
 		},
 		"button": {
-			"download_only": "Baixar",
+			"download_firmware": "Baixar",
+ "download_updater": "Baixar atualizador",
+			"copy_command": "Copiar comando",
 			"check_version": "Verificar versão",
 			"set_update_mode": "Colocar no modo de atualização",
 			"select_update_mode": "Selecionar dispositivo no modo DFU",
@@ -87,7 +89,10 @@
 	"toasts": {
 		"show_all_versions_description": "Mostrar todas as versões de firmware, incluindo as que não forem testadas completamente. Isto não é recomendado!",
 		"packet_send_delay_description": "Intervalo entre mandando packets ao dispositivo. Um intervalo maior manda dados mais devagar mas é mais provável de atualizar seu dispositivo com sucesso. Usando o valor de -1 desativa isso completamente.",
-		"download_only_description": "Baixa apenas o arquivo de firmware ao seu computador sem atualizar o rastreador. Útil para usuários avançados experimentarem.",
+ "manual_update_description": "Atualizar os rastreadores manualmente para usuários avançados, se não suportado, ou você quer baixar o firmware para experimentar.",
+ "os_unsupported": "Seu sistema operacional não é suportado para atualização manual, por favor tente a atualização automática.",
+		"command_copied": "Comando copiado!",
+		"command_copy_failed": "Falha ao copiar comando!",
 		"web_bluetooth_not_supported": "Web Bluetooth não é suportado (ou está desativado globalmente) neste navegador. Por favor use Chrome, Edge ou outro navegador baseado em Chromium para atualizar o firmware do seu dispositivo.",
 		"demo_mode_description": "Ativar modo de demonstração para simular o processo de atualização sem atualizar seu dispositivo de verdade. Apenas para mostrar!",
 		"demo_enabled": "Modo de demonstração está ativado - todas ações são simuladas"
