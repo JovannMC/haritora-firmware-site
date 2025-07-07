@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { m } from '$lib/paraglide/messages.js';
-	import { packetSendDelay, demoMode, type FirmwareVersion } from '$lib/store';
+	import {
+		packetSendDelay,
+		demoMode,
+		type FirmwareVersion,
+		urlPrefix,
+		getDFUCommand
+	} from '$lib/store';
 	import { Device, firmwareVersions } from '$lib/store';
 	import { addToast } from '$lib/store/ToastProvider';
 	import { firmwareUpdater } from '$lib/store/updater';
@@ -11,10 +17,10 @@
 	import { onMount } from 'svelte';
 
 	let selectedDevice = $state(Device.HaritoraX2);
-	let firmwareList = $derived(firmwareVersions[selectedDevice]);
+	let firmwareList = $derived($firmwareVersions[selectedDevice]);
 	let selectedFirmware = $state<FirmwareVersion>();
 	let showAllVersions = $state(false);
-	let downloadOnly = $state(false);
+	let manualUpdate = $state(false);
 
 	let dfuDevice = $state<BluetoothDevice | null>(null);
 	let updateProgress = $state(0);
@@ -51,15 +57,26 @@
 	$effect(() => {
 		// can only download firmware for gx dongles
 		if (selectedDevice === Device.GX) {
-			downloadOnly = true;
-			const downloadOnlyCheckbox = document.getElementById('download-only') as HTMLInputElement;
-			if (downloadOnlyCheckbox) {
-				downloadOnlyCheckbox.checked = true;
-				downloadOnlyCheckbox.disabled = true;
+			manualUpdate = true;
+			const manualCheckbox = document.getElementById('manual-update') as HTMLInputElement;
+			const demoModeCheckbox = document.getElementById('demo-mode') as HTMLInputElement;
+			if (manualCheckbox) {
+				manualCheckbox.checked = true;
+				manualCheckbox.disabled = true;
+				manualUpdate = true;
+			}
+			if (demoModeCheckbox) {
+				demoModeCheckbox.checked = false;
+				demoModeCheckbox.disabled = true;
 			}
 		} else {
-			const downloadOnlyCheckbox = document.getElementById('download-only') as HTMLInputElement;
-			if (downloadOnlyCheckbox) downloadOnlyCheckbox.disabled = false;
+			const downloadOnlyCheckbox = document.getElementById('manual-update') as HTMLInputElement;
+			const demoModeCheckbox = document.getElementById('demo-mode') as HTMLInputElement;
+			if (downloadOnlyCheckbox) {
+				downloadOnlyCheckbox.disabled = false;
+				manualUpdate = false;
+			}
+			if (demoModeCheckbox) demoModeCheckbox.disabled = false;
 		}
 	});
 
@@ -69,7 +86,31 @@
 		}
 	});
 
-	// Setup callbacks for both real and simulated updaters
+	$effect(() => {
+		if (manualUpdate && browser) {
+			// check if user is NOT on Windows
+			const isWindows = navigator.userAgent.includes('Windows');
+			if (!isWindows) {
+				addToast('warning', m['toasts.os_unsupported']?.(), false);
+				console.log(`Unsupported OS platform, user agent: ${navigator.userAgent}`);
+			}
+		}
+	});
+
+	$effect(() => {
+		// disable demo mode if manual update is enabled, else enable
+		if (!browser) return;
+		const demoModeCheckbox = document.getElementById('demo-mode') as HTMLInputElement;
+		if (demoModeCheckbox) {
+			if (manualUpdate) {
+				demoModeCheckbox.checked = false;
+				demoModeCheckbox.disabled = true;
+			} else {
+				demoModeCheckbox.disabled = false;
+			}
+		}
+	});
+
 	function setupUpdaterCallbacks() {
 		const progressCallback = (progress: { currentBytes: number; totalBytes: number }) => {
 			updateProgress = Math.round((progress.currentBytes / progress.totalBytes) * 100);
@@ -89,15 +130,33 @@
 			firmwareUpdater.setLogCallback(logCallback);
 		}
 
-		simulatedUpdater.setProgressCallback(progressCallback);
-		simulatedUpdater.setLogCallback(logCallback);
+		if (simulatedUpdater) {
+			simulatedUpdater.setProgressCallback(progressCallback);
+			simulatedUpdater.setLogCallback(logCallback);
+		}
 	}
 
-	setupUpdaterCallbacks();
+	async function handleDownload(type: 'firmware' | 'updater') {
+		if (type === 'firmware') {
+			if (!selectedFirmware?.filename) throw new Error('No firmware file specified');
+			window.open(selectedFirmware.filename, '_blank');
+		} else {
+			if (selectedDevice === Device.GX) {
+				window.open(`${urlPrefix}/gx_update.exe`, '_blank');
+			} else {
+				window.open(`${urlPrefix}/pydfu.exe`, '_blank');
+			}
+		}
+	}
 
-	async function handleDownload() {
-		if (!selectedFirmware?.filename) throw new Error('No firmware file specified');
-		window.open(selectedFirmware.filename, '_blank');
+	async function handleCopy(command: string) {
+		try {
+			await navigator.clipboard.writeText(command);
+			addToast('success', m['toasts.command_copied'](), true);
+		} catch (error) {
+			addToast('error', m['toasts.command_copy_failed'](), false);
+			console.error('Failed to copy command:', error);
+		}
 	}
 
 	async function handleCheckVersion() {
@@ -248,8 +307,10 @@
 		}
 	}
 
-	// check for Web Bluetooth support on page load
+	// set up updater callbacks & check for Web Bluetooth support on page load
 	onMount(async () => {
+		setupUpdaterCallbacks();
+
 		console.log(`Browser: ${browser}`);
 		if (!browser) return;
 
@@ -336,11 +397,11 @@
 					</button>
 				</div>
 				<div class="flex items-center gap-2">
-					<label for="download-only" class="text-sm">{m['settings.download_only']?.()}:</label>
-					<input type="checkbox" id="download-only" class="checkbox" bind:checked={downloadOnly} />
+					<label for="manual-update" class="text-sm">{m['settings.manual_update']?.()}:</label>
+					<input type="checkbox" id="manual-update" class="checkbox" bind:checked={manualUpdate} />
 					<button
 						class="btn-icon variant-ghost"
-						onclick={() => addToast('info', m['toasts.download_only_description'](), false)}
+						onclick={() => addToast('info', m['toasts.manual_update_description'](), false)}
 					>
 						<Icon icon="mdi:information-outline" />
 					</button>
@@ -369,21 +430,58 @@
 
 	<!-- DFU Steps -->
 	<div class="flex flex-col items-center gap-6 rounded-lg bg-gray-800 p-6 shadow">
-		{#if downloadOnly}
+		{#if manualUpdate}
+			<!-- Manual update -->
 			<div class="flex flex-col items-center justify-center gap-3">
 				<div class="text-center">
-					<p>{m['dfu.step.download_only']({ device: selectedDevice })}</p>
-					<p class="text-sm opacity-70">{m['dfu.step_note.download_only']()}</p>
+					<p>{m['dfu.step.download_firmware']()}</p>
+					<p class="text-sm opacity-70">{m['dfu.step_note.download_firmware']()}</p>
+				</div>
+				<button
+					class="btn bg-primary-500"
+					disabled={isUpdating || !selectedFirmware}
+					onclick={() => handleDownload('firmware')}
+				>
+					{m['dfu.button.download_firmware']()}
+				</button>
+			</div>
+			<hr class="hr" />
+			<div class="flex flex-col items-center justify-center gap-3">
+				<div class="text-center">
+					<p>{m['dfu.step.download_updater']()}</p>
+					<p class="text-sm opacity-70">{m['dfu.step_note.download_updater']()}</p>
+				</div>
+				<button
+					class="btn bg-primary-500"
+					disabled={isUpdating || !selectedFirmware}
+					onclick={() => handleDownload('updater')}
+				>
+					{m['dfu.button.download_updater']()}
+				</button>
+			</div>
+			<hr class="hr" />
+			{@const isDongle = selectedDevice === Device.GX}
+			{@const filename = selectedFirmware?.filename?.split('/').pop() || 'Unknown'}
+			{@const command = getDFUCommand(
+				selectedDevice,
+				filename,
+				!isDongle ? '(MAC_ADDRESS)' : undefined
+			)}
+			<div class="flex flex-col items-center justify-center gap-3">
+				<div class="text-center">
+					<p>{m['dfu.step.copy_command']()}</p>
+					<p class="text-sm opacity-70">{m['dfu.step_note.copy_command']({ command })}</p>
 				</div>
 				<button
 					class="btn bg-secondary-500"
 					disabled={isUpdating || !selectedFirmware}
-					onclick={handleDownload}
+					onclick={() => handleCopy(command)}
 				>
-					{m['dfu.button.download_only']()}
+					{m['dfu.button.copy_command']()}
 				</button>
 			</div>
 		{:else}
+			<!-- Automatic update -->
 			<div class="flex flex-col items-center justify-center gap-3">
 				<div class="text-center">
 					<p>{m['dfu.step.check_version']({ device: selectedDevice })}</p>

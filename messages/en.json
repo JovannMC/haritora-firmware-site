@@ -9,7 +9,7 @@
 		"settings": "Settings",
 		"packet_send_delay": "Packet send delay (ms)",
 		"show_all_versions": "Show untested versions",
-		"download_only": "Download firmware only",
+		"manual_update": "Manual/download update",
 		"demo_mode": "Demo mode"
 	},
 	"firmware": {
@@ -38,21 +38,27 @@
 	},
 	"dfu": {
 		"step": {
-			"download_only": "Step 0: Download the firmware to your local device.",
+			"download_firmware": "Step 1: Download the firmware to your local device.",
+			"download_updater": "Step 2: Download the firmware updater to your local device.",
+			"copy_command": "Step 3: Run the firmware updater command.",
 			"check_version": "Step 0: Check the firmware of your {device} device.",
 			"set_update_mode": "Step 1: Put your {device} device into update mode.",
 			"select_update_mode": "Step 2: Select your {device} device again.",
 			"flash": "Step 3: Flash the selected firmware to your {device} device."
 		},
 		"step_note": {
-			"download_only": "Simply downloading the firmware to your device without flashing it to a device. Useful for archival purposes or advanced users to experiment with.",
+			"download_firmware": "Download the firmware you want to flash to your local device. This is an official firmware file provided by Shiftall.",
+			"download_updater": "Download the firmware updater to your local device. This is the official CLI tool by Shiftall to flash the firmware to your device.",
+			"copy_command": "Copy and run the following command into your terminal to start the firmware update process: {command}",
 			"check_version": "This will check the current firmware version of your device. This is optional and can be skipped if you know the current version.",
 			"set_update_mode": "This will turn your device into DFU (Device Firmware Update) mode, letting the devices appear as \"HaritoraXW-Update\".",
 			"select_update_mode": "Select the device that is now in DFU (Device Firmware Update) mode. It should appear as \"HaritoraXW-Update\".",
 			"flash": "This will flash the selected firmware to your device."
 		},
 		"button": {
-			"download_only": "Download",
+			"download_firmware": "Download firmware",
+			"download_updater": "Download updater",
+			"copy_command": "Copy command",
 			"check_version": "Check version",
 			"set_update_mode": "Set to update mode",
 			"select_update_mode": "Select DFU device",
@@ -87,7 +93,10 @@
 	"toasts": {
 		"show_all_versions_description": "Show all firmware versions, including those that have not been tested thoroughly. Not recommended!",
 		"packet_send_delay_description": "Delay between sending packets to the device. A larger delay sends data slower but is more likely to update your device successfully. Using -1 disables it entirely.",
-		"download_only_description": "Only download the firmware file to your device without flashing it. Useful for advanced users to experiment with.",
+		"manual_update_description": "Manually update the trackers for advanced users, if unsupported, or you want to download the firmware to experiment with.",
+		"os_unsupported": "Your OS is not supported for manual update, please attempt the update automatically instead.",
+		"command_copied": "Command copied to clipboard!",
+		"command_copy_failed": "Failed to copy command to clipboard!",
 		"web_bluetooth_not_supported": "Web Bluetooth is not supported (or disabled globally) in this browser. Please use Chrome, Edge, or another Chromium-based browser to update your device firmware.",
 		"demo_mode_description": "Enable demo mode to simulate the firmware update process without flashing real devices. Just to show it off!",
 		"demo_enabled": "Demo mode is enabled - all actions are simulated"
@@ -96,15 +105,21 @@
 		"title": "Frequently Asked Questions (FAQ)",
 		"what_is_this_website": {
 			"title": "What is this website?",
-			"description": "This is a website that allows you to update the firmware on many of Shiftall's products so you do not need to download the official app. This allows you to update your devices without the official app, allowing mobile users to update once again! This also includes a major fix to be more reliable, allowing even lower-end bluetooth adapters to update successfully!"
+			"description": "This is a website that allows you to update the firmware on many of Shiftall's products so you do not need to download the official app.\n\nThis allows you to update your devices without the official app, allowing mobile users to update once again! This also includes a major fix to be more reliable, allowing even lower-end bluetooth adapters to update successfully!"
 		},
 		"what_is_supported": {
 			"title": "What is supported?",
-			"description": "Currently, the HaritoraX Wireless and HaritoraX 2 are supported, with the GX(6/2) dongles coming soon. The older HaritoraX Wired (1.0/1.1/1.1b) need to be investigated further and I need help finding firmware files for them."
+			"description": "Currently, the HaritoraX Wireless and HaritoraX 2 are supported, with the GX(6/2) dongles coming soon. The older HaritoraX Wired (1.0/1.1/1.1b) need to be investigated further and I need help finding firmware files for them.\n\nPCs & Android devices with Bluetooth on a browser with WebBluetooth API can use the website to update the trackers, but for iOS, read below."
 		},
 		"how_does_it_work": {
 			"title": "How does it work?",
 			"description": "The devices use the nRF52 platform and can update via BLE or serial/USB, so this uses Web Bluetooth to update the HaritoraX Wireless and HaritoraX 2, with WebUSB for the GX(6/2) dongles (when it's completed)."
+		},
+		"how_update_mobile": {
+			"title": "How do I update on mobile (iOS/Android)?",
+			"description": "To update on Android devices, use a supported browser and use the website like normal. If you are on iOS device (iPhone, iPad, etc), you are not able to update through the website. You must download the firmware file manually (using the \"Manual/download update\" option) and then use the \"nRF Connect for Mobile\" app on {ios} (or {android}, if you wish) to update them.\n\nDownload & run the app, find the device you want to update, go into the \"DFU\" section and select the firmware file you downloaded. Ensure that you disable \"Enable Alternative Advertising Mode\", otherwise it won't enter DFU mode!",
+			"ios_text": "iOS",
+			"android_text": "Android"
 		},
 		"how_can_i_contribute": {
 			"title": "How can I contribute?",
@@ -114,7 +129,7 @@
 		},
 		"how_did_you_gather_firmware": {
 			"title": "How did you gather the firmware files?",
-			"description": "The firmware files were gathered from the official HaritoraX Wireless DFU {official_website} and {shiftall_vr_manager} (including the {playtest_link} and early beta tests before Steam). Since Shiftall VR Manager is on Steam, we can download old versions at any time (through the {depot_link} and {manifests_link}) which include the firmware files of the HaritoraX Wireless, HaritoraX 2, and the GX(6/2) dongles. If you have any firmware files not on this site, please consider {contributing_link}.",
+			"description": "The firmware files were gathered from the official HaritoraX Wireless DFU {official_website} and {shiftall_vr_manager} (including the {playtest_link} and early beta tests before Steam). Since Shiftall VR Manager is on Steam, we can download old versions at any time (through the {depot_link} and {manifests_link}) which include the firmware files of the HaritoraX Wireless, HaritoraX 2, and the GX(6/2) dongles.\n\nIf you have any firmware files not on this site, please consider {contributing_link}.",
 			"website_text": "website",
 			"shiftall_vr_manager_text": "Shiftall VR Manager",
 			"playtest_text": "playtest",
@@ -128,7 +143,7 @@
 		},
 		"web_bluetooth_error": {
 			"title": "Why do I get a \"web bluetooth is not supported\" error?",
-			"description": "This means that your browser does not support Web Bluetooth or it is not enabled. Please ensure you are using a supported chromium-based browser (like Chrome or Edge). Some browsers like Brave disable Web Bluetooth by default and require changing browser flags (chrome://flags) or do not support it at all (Firefox)."
+			"description": "This means that your browser does not support Web Bluetooth or it is not enabled. Please ensure you are using a supported chromium-based browser (like Chrome or Edge).\n\nSome browsers like Brave disable Web Bluetooth by default and require changing browser flags (chrome://flags) or do not support it at all (Firefox)."
 		},
 		"why_bluetooth_needed": {
 			"title": "Why can I only update my devices with Bluetooth?",

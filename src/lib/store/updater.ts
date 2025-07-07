@@ -1,4 +1,4 @@
-import { packetSendDelay, type FirmwareVersion } from './index';
+import { packetSendDelay, type FirmwareVersion } from '.';
 import CRC32 from 'crc-32';
 import JSZip, { type JSZipObject } from 'jszip';
 import SecureDfu from 'web-bluetooth-dfu';

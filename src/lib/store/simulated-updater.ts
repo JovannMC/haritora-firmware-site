@@ -1,6 +1,7 @@
 import { type FirmwareVersion, Device, firmwareVersions } from '$lib/store';
 import { addToast } from '$lib/store/ToastProvider';
 import { m } from '$lib/paraglide/messages.js';
+import { get } from 'svelte/store';
 
 export class SimulatedUpdater {
 	private logCallback: ((message: string) => void) | null = null;
@@ -43,11 +44,12 @@ export class SimulatedUpdater {
 		selectedDevice: Device,
 		currentFirmware?: FirmwareVersion
 	): FirmwareVersion {
-		const versions = firmwareVersions[selectedDevice].filter(
+		const currentVersions = get(firmwareVersions);
+		const versions = currentVersions[selectedDevice].filter(
 			(fw) => fw.version !== currentFirmware?.version
 		);
 		return (
-			versions[Math.floor(Math.random() * versions.length)] || firmwareVersions[selectedDevice][0]
+			versions[Math.floor(Math.random() * versions.length)] || currentVersions[selectedDevice][0]
 		);
 	}
 

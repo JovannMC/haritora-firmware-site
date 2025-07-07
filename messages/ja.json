@@ -8,7 +8,9 @@
 	"settings": {
 		"settings": "設定",
 		"packet_send_delay": "パケット送信遅延時間(ms)",
-		"show_all_versions": "未テストのバージョンを表示"
+		"show_all_versions": "未テストのバージョンを表示",
+		"manual_update": "Manual/download update",
+		"demo_mode": "Demo mode"
 	},
 	"firmware": {
 		"version": "v{version} ({date})",
@@ -36,16 +38,28 @@
 	},
 	"dfu": {
 		"step": {
-			"set_update_mode": "ステップ1: {device} トラッカーをDFUモードにします。",
-			"select_update_mode": "ステップ2: {device} トラッカーを再度選択します。",
-			"flash": "ステップ3： 選択したファームウェアを {device} トラッカーに書き込みます。"
+			"download_firmware": "ステップ1: ファームウェアをローカルにダウンロードします。",
+			"download_updater": "ステップ2: ファームウェアアップデータをローカルにダウンロードします。",
+			"copy_command": "ステップ3: ファームウェア・アップデーター・コマンドを実行します。",
+			"check_version": "ステップ0: 使用されている {device} のファームウェアバージョンを確認します。",
+			"set_update_mode": "ステップ1: {device} をDFUモードにします。",
+			"select_update_mode": "ステップ2: {device} を再度選択します。",
+			"flash": "ステップ3: 選択したファームウェアを {device} に書き込みます。"
 		},
 		"step_note": {
-			"set_update_mode": "これにより、トラッカーはDFU（Device Firmware Update）モードになり、\"HaritoraXW-Update\"と表示されます。",
-			"select_update_mode": "DFU（デバイスファームウェアアップデート）モードになったトラッカーを選択します。 \"HaritoraXW-Update\"と表示されるはずです。",
+			"download_firmware": "フラッシュしたいファームウェアをローカルにダウンロードします。 これはShiftallが提供する公式ファームウェアファイルです。",
+			"download_updater": "ファームウェアアップデータをローカルにダウンロードします。 これは、あなたのデバイスにファームウェアをフラッシュするためのShiftallによる公式CLIツールです。",
+			"copy_command": "以下のコマンドをターミナルにコピーして実行し、ファームウェア・アップデート・プロセスを開始します： {command}",
+			"check_version": "（オプション）お使いのデバイスの現在のファームウェアバージョンをチェックします。 現在のファームウェアバージョンを知っている場合は省略できます。",
+			"set_update_mode": "これにより、デバイスはDFU（Device Firmware Update）モードになり、\"HaritoraXW-Update\"と表示されます。",
+			"select_update_mode": "DFU（デバイスファームウェアアップデート）モードになったデバイスを選択します。 \"HaritoraXW-Update\"と表示されているはずです。",
 			"flash": "これにより、選択したファームウェアがトラッカーに書き込まれます。"
 		},
 		"button": {
+			"download_firmware": "ファームウェアのダウンロード",
+			"download_updater": "アップデータのダウンロード",
+			"copy_command": "コマンドのコピー",
+			"check_version": "バージョンを確認する",
 			"set_update_mode": "更新モードに設定",
 			"select_update_mode": "DFUデバイスを選択",
 			"flash": "ファームウェア書き込み"
@@ -79,7 +93,13 @@
 	"toasts": {
 		"show_all_versions_description": "（非推奨）十分にテストされていないものも含め、すべてのファームウェアバージョンを表示します。",
 		"packet_send_delay_description": "デバイスにパケットを送信する間の遅延。 遅延が大きいほど、データの送信は遅くなりますが、デバイスのアップデートが成功する可能性が高くなります。 1を使用すると、完全に無効になります。",
-		"web_bluetooth_not_supported": "このブラウザでは、Web Bluetoothはサポートされていません（またはグローバルで無効になっています）。 デバイスのファームウェアを更新するには、Chrome、Edge、または他のChromiumベースのブラウザを使用してください。"
+		"manual_update_description": "（上⑨者向け）サポートされていない場合、またはファームウェアをダウンロードして試したい場合は、トラッカーを手動でアップデートします。",
+		"os_unsupported": "お使いのOSは手動アップデートに対応していません。自動アップデートをお試しください。",
+		"command_copied": "クリップボードにコマンドをコピーしました！",
+		"command_copy_failed": "クリップボードにコマンドをコピーできませんでした！",
+		"web_bluetooth_not_supported": "このブラウザでは、Web Bluetoothはサポートされていません（またはグローバルで無効になっています）。 デバイスのファームウェアを更新するには、Chrome、Edge、または他のChromiumベースのブラウザを使用してください。",
+		"demo_mode_description": "デモモードを有効にすると、実際のデバイスをフラッシュせずにファームウェア・アップデート・プロセスをシミュレートできます。動作確認にお使いください。",
+		"demo_enabled": "デモモードが有効 - すべての動作がシミュレートされます。"
 	},
 	"faq": {
 		"title": "よくある質問 (FAQ)",
@@ -109,7 +129,7 @@
 			"playtest_text": "playtest",
 			"depot_text": "depot",
 			"manifests_text": "manifests",
-			"contributing_text": "contributing"
+			"contributing_text": "貢献"
 		},
 		"why_did_it_not_work": {
 			"title": "なぜうまくいかなかったのですか？ // なぜ進捗状況がパーセンテージの間でジャンプするのですか？",
@@ -118,6 +138,10 @@
 		"web_bluetooth_error": {
 			"title": "なぜ\"web bluetooth is not supported\"エラーが表示されるのですか？",
 			"description": "これは、お使いのブラウザがWebブルートゥースをサポートしていないか、有効になっていないことを意味します。 サポートされているChromiumベースのブラウザ（ChromeやMS Edgeなど）を使用していることを確認してください。\nBraveのように、デフォルトでWeb Bluetoothを無効にし、ブラウザのフラグ（chrome://flags）を変更する必要があるブラウザや、まったくサポートしていないブラウザ（Firefox）もあります。"
+		},
+		"why_bluetooth_needed": {
+			"title": "なぜBluetoothでしかアップデートできないのですか？",
+			"description": "我々の知る限り、ファームウェアの制限によってBluetooth経由でしかアップデートできません。 Shiftallは将来ファームウェアのアップデートでサポートを追加するかもしれないですが、現在はアップデートにBluetoothが必要です。"
 		}
 	}
 }
