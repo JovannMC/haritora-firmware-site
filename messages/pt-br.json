@@ -38,7 +38,7 @@
 	},
 	"dfu": {
 		"step": {
-			"download_only": "Etapa 0: Baixe o firmware para o seu dispositivo local.",
+			"download_firmware": "Etapa 0: Baixe o firmware para o seu dispositivo local.",
 			"check_version": "Etapa 0: Verifique o firmware do seu {device} dispositivo.",
 			"set_update_mode": "Etapa 1: Coloque seu {device} dispositivo no modo de atualização.",
 			"select_update_mode": "Etapa 2: Selecione seu {device} dispositivo de novo.",
