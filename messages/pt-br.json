@@ -48,6 +48,8 @@
 		},
 		"step_note": {
 			"download_firmware": "Baixa o firmware que você quer atualizar ao seu dispositivo local. Isso é um arquivo de firmware oficial da Shiftall.",
+			"download_updater": "Baixar o atulizador de firmware ao seu dispositivo local. Isso é a ferramenta de CLI oficial da Shiftall feita para atualizar o firmware do seu dispositivo.",
+			"copy_command": "Copie e cole este comando no seu terminal para iniciar o processo de atualização de firmware: {command}",
 			"check_version": "Isso verificará a versão de firmware atual do seu dispositivo. Isso é opcional and pode ser ignorado se você sabe a versão atual do seu rastreador.",
 			"set_update_mode": "Isso colocará seu dispositivo no modo DFU (Device Firmware Update), deixando os dispositivos aparecerem como \"HaritoraXW-Update\".",
 			"select_update_mode": "Selecione o dispositivo que agora está no modo DFU (Device Firmware Update). Deve aparecer como \"HaritoraXW-Update\".",
