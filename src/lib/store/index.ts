@@ -131,7 +131,13 @@ function createHaritoraX2Versions(): FirmwareVersion[] {
 			date: '2025-06-30', // date from official manual
 			filename: `${urlPrefix}/mc4seb/mc4seb-2-ab87abb.zip`,
 			notes: m['firmware.versions.mc4seb.1.0.27']()
-		}
+		},
+		{
+			version: '1.0.30',
+			date: '2025-10-23', // date from steam release v1.7.6 - manual states "2025-10-26" for some reason
+			filename: `${urlPrefix}/mc4seb/mc4seb-2-2464314.zip`,
+			notes: m['firmware.versions.mc4seb.1.0.30']()
+		},
 	];
 }
 

@@ -51,7 +51,7 @@
 
 <!-- modified the main class to be full on mobile, and limited on larger screens - should push this to VERT -->
 <div
-	class="flex max-w-[100%] items-center justify-between gap-4 p-4 md:max-w-md bg-{color}-300 border-{color}-500 rounded-lg border-l-4 shadow-md"
+	class="flex max-w-[100%] md:max-w-md items-center justify-between gap-4 p-4 bg-{color}-300 border-{color}-500 rounded-lg border-l-4 shadow-md"
 	in:fly={{
 		duration: durations.enter,
 		easing: quintOut,
