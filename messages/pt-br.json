@@ -20,9 +20,10 @@
 			"mc4seb": {
 				"1.0.14": "Atualização pequena.",
 				"1.0.15": "Ângulo de captura do sensor de LiDAR melhorou (mais amplo).\nCorrige um problema que a função de desligar automaticamente algumas vezes não funcionava no modo do dongle GX.\nOutras modificações pequenas.",
-				"1.0.24": "Corrige um erro raro onde o dispositivo não podia ser desligado sem desligar o dispositivo à força.\nCorrige o problema onde o LED vermelho iria piscar rapidamente pouco antes de terminar de carregar a bateria.\nOutros problemas pequenos corrigidos.",
-				"1.0.25": "Corrige um problema onde o LED vermelho iria ficar ligado mesmo depois de terminar de carregar.",
-				"1.0.27": "Corrige um problema raro onde a conexão do dongle GX poderia ser inesperadamente encerrada."
+				"1.0.24": "Corrige um erro raro em que o dispositivo não podia ser desligado sem desligar o dispositivo à força.\nCorrige o problema em que o LED vermelho iria piscar rapidamente pouco antes de terminar de carregar a bateria.\nOutros problemas pequenos corrigidos.",
+				"1.0.25": "Corrige um problema em que o LED vermelho iria ficar ligado mesmo depois de terminar de carregar.",
+				"1.0.27": "Corrige um problema raro em que a conexão do dongle GX poderia ser inesperadamente encerrada.",
+				"1.0.30": "Corrige um erro em que o dispositivo ocasionalmente falhava ao ligar."
 			},
 			"mc3s": {
 				"1.0.22": "Corrige um bug que as configurações do local anexado(peito, quadril, etc.) poderia ser resetado.\nOutras modificações pequenas.",
@@ -57,12 +58,16 @@
 		},
 		"button": {
 			"download_firmware": "Baixar",
-			"download_updater": "Baixar atualizador",
+ "download_updater": "Baixar atualizador",
 			"copy_command": "Copiar comando",
 			"check_version": "Verificar versão",
 			"set_update_mode": "Colocar no modo de atualização",
 			"select_update_mode": "Selecionar dispositivo no modo DFU",
 			"flash": "Atualizar firmware"
+		},
+		"progress": {
+			"status": "Status: {status}",
+			"progress": "Progresso: {progress}%"
 		},
 		"status": {
 			"waiting": "esperando por usuário...",
@@ -82,17 +87,15 @@
 			"firmware_completed": "atualização de firmware completa!",
 			"please_select": "por favor selecione um dispositivo e firmware primeiro",
 			"firmware_updater_not_initialized": "atualizador de firmware não foi inicializado",
-			"status": "Status: {status}",
-			"note": "Está com problemas? Confira a página de {faq}!",
-			"faq": "perguntas frequentes"
+			"status": "Status: {status}"
 		},
 		"debug_log": "Registro de depuração:"
 	},
 	"toasts": {
 		"show_all_versions_description": "Mostrar todas as versões de firmware, incluindo as que não forem testadas completamente. Isto não é recomendado!",
 		"packet_send_delay_description": "Intervalo entre mandando packets ao dispositivo. Um intervalo maior manda dados mais devagar mas é mais provável de atualizar seu dispositivo com sucesso. Usando o valor de -1 desativa isso completamente.",
-		"manual_update_description": "Atualizar os rastreadores manualmente para usuários avançados, se não suportado, ou você quer baixar o firmware para experimentar.",
-		"os_unsupported": "Seu sistema operacional não é suportado para atualização manual, por favor tente a atualização automática.",
+ "manual_update_description": "Atualizar os rastreadores manualmente para usuários avançados, se não suportado, ou você quer baixar o firmware para experimentar.",
+ "os_unsupported": "Seu sistema operacional não é suportado para atualização manual, por favor tente a atualização automática.",
 		"command_copied": "Comando copiado!",
 		"command_copy_failed": "Falha ao copiar comando!",
 		"web_bluetooth_not_supported": "Web Bluetooth não é suportado (ou está desativado globalmente) neste navegador. Por favor use Chrome, Edge ou outro navegador baseado em Chromium para atualizar o firmware do seu dispositivo.",
