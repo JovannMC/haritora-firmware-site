@@ -23,7 +23,8 @@
 				"1.0.24": "Fixed a rare issue where the power could not be turned on without a forced shutdown.\nFixed a problem where the red LED would flash rapidly just before charging was complete.\nOther minor fixes",
 				"1.0.25": "Fixed an issue where the red LED would remain on even after charging was complete.",
 				"1.0.27": "Fixed a rare issue where the GX dongle connection could be unexpectedly disconnected.",
-				"1.0.30": "Fixed an issue where the device occasionally failed to power on."
+				"1.0.30": "Fixed an issue where the device occasionally failed to power on.",
+				"1.0.32": "Improved battery life by optimizing processing.\nFixed an issue where the red LED stayed on for a while after charging was stopped."
 			},
 			"mc3s": {
 				"1.0.22": "Fixed a bug that the settings of attach location(CHEST, HIP, etc.) were rewritten.\nOther minor modifications.",
