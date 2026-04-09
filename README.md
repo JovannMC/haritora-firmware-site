@@ -1,6 +1,6 @@
 # Haritora Firmware Site
 
-A website to manage the firmware of your Haritora / other Shiftall devices, making use of Web Bluetooth & WebUSB. Made in SvelteKit & Skeleton.
+A website to manage the firmware of your Haritora / other Shiftall devices, making use of Web Bluetooth. Made in SvelteKit & Skeleton.
 
 Currently supports the `HaritoraX Wireless` & `HaritoraX 2 trackers` which both update using the [web-bluetooth-dfu](https://github.com/thegecko/web-bluetooth-dfu) package. `HaritoraX Wired` and `GX(6/2)` dongles are still being investigated! Most devices use the `nRF52` platform.
 

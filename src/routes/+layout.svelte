@@ -59,15 +59,15 @@
 	<meta name="msapplication-TileImage" content="/icons/mstile-144x144.png" />
 
 	<!-- SEO -->
-	<meta name="description" content="A website to update your Haritora devices through WebBluetooth and WebUSB." />
-	<meta name="keywords" content="Haritora, HaritoraX, HaritoraX Wireless, HaritoraX 2, GX6, Shiftall, DFU, Firmware, WebBluetooth, WebUSB" />
+	<meta name="description" content="A website to update your Haritora devices through WebBluetooth." />
+	<meta name="keywords" content="Haritora, HaritoraX, HaritoraX Wireless, HaritoraX 2, GX6, Shiftall, DFU, Firmware, WebBluetooth" />
 	<meta name="author" content="JovannMC" />
 
 	<!-- Open Graph Tags -->
 	<meta content="SlimeTora: Haritora Firmware Website" property="og:title" />
 	<meta content="site" property="og:type" />
 	<meta
-		content="A website to update your Haritora devices through WebBluetooth and WebUSB."
+		content="A website to update your Haritora devices through WebBluetooth."
 		property="og:description"
 	/>
 	<meta content="https://dfu.slimetora.dev" property="og:url" />
@@ -78,7 +78,7 @@
 	<meta name="twitter:card" content="summary_large_image">
 	<meta property="twitter:url" content="https://dfu.slimetora.dev">
 	<meta name="twitter:title" content="site">
-	<meta name="twitter:description" content="A website to update your Haritora devices through WebBluetooth and WebUSB.">
+	<meta name="twitter:description" content="A website to update your Haritora devices through WebBluetooth.">
 	<meta name="twitter:image" content="https://dfu.slimetora.dev/logo.png">
 </svelte:head>
 
